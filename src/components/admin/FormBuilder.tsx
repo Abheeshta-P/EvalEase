@@ -1,99 +1,136 @@
-
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Plus, 
-  Trash2, 
-  ArrowLeft, 
-  Star, 
-  Type, 
-  CheckSquare, 
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Plus,
+  Trash2,
+  ArrowLeft,
+  Star,
+  Type,
+  CheckSquare,
   Circle,
   Save,
-  Eye
-} from 'lucide-react';
+  Eye,
+} from "lucide-react";
+
+type InputTypes = "rating" | "text" | "textarea" | "multiple" | "checkbox";
+
+type Question = {
+  id: number;
+  type: InputTypes;
+  title: string;
+  required: boolean;
+  options: string[];
+  ratingScale: number | null;
+};
+
+type QuestionType = {
+  type: InputTypes;
+  label: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+};
 
 const FormBuilder = () => {
-  const [formTitle, setFormTitle] = useState('');
-  const [formDescription, setFormDescription] = useState('');
-  const [questions, setQuestions] = useState([]);
-  const [showPreview, setShowPreview] = useState(false);
+  const [formTitle, setFormTitle] = useState<string>("");
+  const [formDescription, setFormDescription] = useState<string>("");
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
-  const questionTypes = [
-    { type: 'rating', label: 'Rating Scale', icon: Star },
-    { type: 'text', label: 'Text Input', icon: Type },
-    { type: 'textarea', label: 'Long Text', icon: Type },
-    { type: 'multiple', label: 'Multiple Choice', icon: Circle },
-    { type: 'checkbox', label: 'Checkboxes', icon: CheckSquare }
+  const questionTypes: QuestionType[] = [
+    { type: "rating", label: "Rating Scale", icon: Star },
+    { type: "text", label: "Text Input", icon: Type },
+    { type: "textarea", label: "Long Text", icon: Type },
+    { type: "multiple", label: "Multiple Choice", icon: Circle },
+    { type: "checkbox", label: "Checkboxes", icon: CheckSquare },
   ];
 
-  const addQuestion = (type) => {
+  const addQuestion = (type: InputTypes) => {
     const newQuestion = {
       id: Date.now(),
       type,
-      title: '',
+      title: "",
       required: false,
-      options: type === 'multiple' || type === 'checkbox' ? ['Option 1'] : [],
-      ratingScale: type === 'rating' ? 5 : null
+      options: type === "multiple" || type === "checkbox" ? ["Option 1"] : [],
+      ratingScale: type === "rating" ? 5 : null,
     };
     setQuestions([...questions, newQuestion]);
   };
 
-  const updateQuestion = (id, field, value) => {
-    setQuestions(questions.map(q => 
-      q.id === id ? { ...q, [field]: value } : q
-    ));
+  const updateQuestion = (id: number, field: keyof Question, value: any) => {
+    setQuestions(
+      questions.map((q) => (q.id === id ? { ...q, [field]: value } : q))
+    );
   };
 
-  const deleteQuestion = (id) => {
-    setQuestions(questions.filter(q => q.id !== id));
+  const deleteQuestion = (id: number) => {
+    setQuestions(questions.filter((q) => q.id !== id));
   };
 
-  const addOption = (questionId) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId ? 
-        { ...q, options: [...q.options, `Option ${q.options.length + 1}`] } : 
-        q
-    ));
+  const addOption = (questionId: number) => {
+    setQuestions(
+      questions.map((q) =>
+        q.id === questionId
+          ? { ...q, options: [...q.options, `Option ${q.options.length + 1}`] }
+          : q
+      )
+    );
   };
 
-  const updateOption = (questionId, optionIndex, value) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId ? 
-        { ...q, options: q.options.map((opt, idx) => idx === optionIndex ? value : opt) } : 
-        q
-    ));
+  const updateOption = (
+    questionId: number,
+    optionIndex: number,
+    value: any
+  ) => {
+    setQuestions(
+      questions.map((q) =>
+        q.id === questionId
+          ? {
+              ...q,
+              options: q.options.map((opt, idx) =>
+                idx === optionIndex ? value : opt
+              ),
+            }
+          : q
+      )
+    );
   };
 
-  const deleteOption = (questionId, optionIndex) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId ? 
-        { ...q, options: q.options.filter((_, idx) => idx !== optionIndex) } : 
-        q
-    ));
+  const deleteOption = (questionId: number, optionIndex: number) => {
+    setQuestions(
+      questions.map((q) =>
+        q.id === questionId
+          ? { ...q, options: q.options.filter((_, idx) => idx !== optionIndex) }
+          : q
+      )
+    );
   };
 
+  // send to backend
   const saveForm = () => {
     const formData = {
       title: formTitle,
       description: formDescription,
       questions,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
-    console.log('Saving form:', formData);
-    alert('Form saved successfully!');
+    console.log("Saving form:", formData);
+    alert("Form saved successfully!");
   };
 
-  const renderQuestionEditor = (question) => {
+  const renderQuestionEditor = (question: Question) => {
     return (
-      <div key={question.id} className="border border-gray-200 rounded-lg p-6 bg-white">
+      <div
+        key={question.id}
+        className="border border-gray-200 rounded-lg p-6 bg-white"
+      >
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
             <input
               type="text"
               placeholder="Enter question title"
               value={question.title}
-              onChange={(e) => updateQuestion(question.id, 'title', e.target.value)}
+              onChange={(e) =>
+                updateQuestion(question.id, "title", e.target.value)
+              }
               className="w-full text-lg font-medium border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:outline-none pb-2"
             />
           </div>
@@ -106,25 +143,35 @@ const FormBuilder = () => {
         </div>
 
         <div className="flex items-center space-x-4 mb-4">
-          <span className="text-sm text-gray-600">Type: {questionTypes.find(t => t.type === question.type)?.label}</span>
+          <span className="text-sm text-gray-600">
+            Type: {questionTypes.find((t) => t.type === question.type)?.label}
+          </span>
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={question.required}
-              onChange={(e) => updateQuestion(question.id, 'required', e.target.checked)}
+              onChange={(e) =>
+                updateQuestion(question.id, "required", e.target.checked)
+              }
             />
             <span className="text-sm text-gray-600">Required</span>
           </label>
         </div>
 
-        {question.type === 'rating' && (
+        {question.type === "rating" && (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Rating Scale (1 to {question.ratingScale})
             </label>
             <select
               value={question.ratingScale}
-              onChange={(e) => updateQuestion(question.id, 'ratingScale', parseInt(e.target.value))}
+              onChange={(e) =>
+                updateQuestion(
+                  question.id,
+                  "ratingScale",
+                  parseInt(e.target.value)
+                )
+              }
               className="border border-gray-300 rounded-md px-3 py-2"
             >
               <option value={5}>1 to 5</option>
@@ -133,16 +180,20 @@ const FormBuilder = () => {
           </div>
         )}
 
-        {(question.type === 'multiple' || question.type === 'checkbox') && (
+        {(question.type === "multiple" || question.type === "checkbox") && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Options
+            </label>
             <div className="space-y-2">
               {question.options.map((option, index) => (
                 <div key={index} className="flex space-x-2">
                   <input
                     type="text"
                     value={option}
-                    onChange={(e) => updateOption(question.id, index, e.target.value)}
+                    onChange={(e) =>
+                      updateOption(question.id, index, e.target.value)
+                    }
                     className="flex-1 border border-gray-300 rounded-md px-3 py-2"
                   />
                   {question.options.length > 1 && (
@@ -184,37 +235,49 @@ const FormBuilder = () => {
                   <span>Back to Editor</span>
                 </button>
               </div>
-              <h1 className="text-xl font-semibold text-gray-900">Form Preview</h1>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Form Preview
+              </h1>
             </div>
           </div>
         </header>
 
         <div className="max-w-2xl mx-auto px-6 py-8">
           <div className="bg-white rounded-xl shadow-sm border p-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">{formTitle || 'Untitled Form'}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              {formTitle || "Untitled Form"}
+            </h1>
             {formDescription && (
               <p className="text-gray-600 mb-8">{formDescription}</p>
             )}
 
             <div className="space-y-6">
               {questions.map((question, index) => (
-                <div key={question.id} className="border-b border-gray-200 pb-6 last:border-b-0">
+                <div
+                  key={question.id}
+                  className="border-b border-gray-200 pb-6 last:border-b-0"
+                >
                   <h3 className="text-lg font-medium text-gray-900 mb-3">
-                    {index + 1}. {question.title || 'Untitled Question'}
-                    {question.required && <span className="text-red-500 ml-1">*</span>}
+                    {index + 1}. {question.title || "Untitled Question"}
+                    {question.required && (
+                      <span className="text-red-500 ml-1">*</span>
+                    )}
                   </h3>
 
-                  {question.type === 'rating' && (
+                  {question.type === "rating" && (
                     <div className="flex space-x-2">
                       {[...Array(question.ratingScale)].map((_, i) => (
-                        <button key={i} className="p-2 border border-gray-300 rounded hover:bg-gray-50">
+                        <button
+                          key={i}
+                          className="p-2 border border-gray-300 rounded hover:bg-gray-50"
+                        >
                           {i + 1}
                         </button>
                       ))}
                     </div>
                   )}
 
-                  {question.type === 'text' && (
+                  {question.type === "text" && (
                     <input
                       type="text"
                       className="w-full border border-gray-300 rounded-md px-3 py-2"
@@ -223,7 +286,7 @@ const FormBuilder = () => {
                     />
                   )}
 
-                  {question.type === 'textarea' && (
+                  {question.type === "textarea" && (
                     <textarea
                       className="w-full border border-gray-300 rounded-md px-3 py-2"
                       rows={4}
@@ -232,21 +295,31 @@ const FormBuilder = () => {
                     />
                   )}
 
-                  {question.type === 'multiple' && (
+                  {question.type === "multiple" && (
                     <div className="space-y-2">
                       {question.options.map((option, optIndex) => (
-                        <label key={optIndex} className="flex items-center space-x-2">
-                          <input type="radio" name={`question-${question.id}`} disabled />
+                        <label
+                          key={optIndex}
+                          className="flex items-center space-x-2"
+                        >
+                          <input
+                            type="radio"
+                            name={`question-${question.id}`}
+                            disabled
+                          />
                           <span>{option}</span>
                         </label>
                       ))}
                     </div>
                   )}
 
-                  {question.type === 'checkbox' && (
+                  {question.type === "checkbox" && (
                     <div className="space-y-2">
                       {question.options.map((option, optIndex) => (
-                        <label key={optIndex} className="flex items-center space-x-2">
+                        <label
+                          key={optIndex}
+                          className="flex items-center space-x-2"
+                        >
                           <input type="checkbox" disabled />
                           <span>{option}</span>
                         </label>
@@ -300,7 +373,9 @@ const FormBuilder = () => {
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Form Info */}
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Form Information</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Form Information
+          </h2>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -331,7 +406,9 @@ const FormBuilder = () => {
 
         {/* Question Types */}
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Add Questions</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Add Questions
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {questionTypes.map((type) => (
               <button
@@ -340,7 +417,9 @@ const FormBuilder = () => {
                 className="flex flex-col items-center space-y-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 transition duration-200"
               >
                 <type.icon className="h-6 w-6 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">{type.label}</span>
+                <span className="text-sm font-medium text-gray-700">
+                  {type.label}
+                </span>
               </button>
             ))}
           </div>
@@ -349,11 +428,13 @@ const FormBuilder = () => {
         {/* Questions */}
         <div className="space-y-6">
           {questions.map((question) => renderQuestionEditor(question))}
-          
+
           {questions.length === 0 && (
             <div className="text-center py-12 bg-white rounded-xl shadow-sm border">
               <Type className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No questions added yet. Add your first question above.</p>
+              <p className="text-gray-600">
+                No questions added yet. Add your first question above.
+              </p>
             </div>
           )}
         </div>
