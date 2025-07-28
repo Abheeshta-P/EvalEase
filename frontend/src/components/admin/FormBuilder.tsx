@@ -11,6 +11,9 @@ import {
   Save,
   Eye,
 } from "lucide-react";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+
 
 type InputTypes = "rating" | "text" | "textarea" | "multiple" | "checkbox";
 
@@ -105,16 +108,42 @@ const FormBuilder = () => {
   };
 
   // send to backend
-  const saveForm = () => {
-    const formData = {
-      title: formTitle,
-      description: formDescription,
-      questions,
-      createdAt: new Date().toISOString(),
-    };
-    console.log("Saving form:", formData);
-    alert("Form saved successfully!");
-  };
+ const navigate = useNavigate();
+
+ const saveForm = async () => {
+   const formData = {
+     title: formTitle,
+     description: formDescription,
+     questions,
+     createdAt: new Date().toISOString(),
+   };
+
+   try {
+     const res = await fetch("http://localhost:8080/api/forms", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify(formData),
+     });
+
+     if (!res.ok) {
+       throw new Error("Failed to save form");
+     }
+
+     const data = await res.json();
+     toast.success("Form saved successfully! 🎉");
+
+     // redirect back one step
+     setTimeout(() => {
+       navigate("/admin/dashboard");
+     }, 1000);
+   } catch (err) {
+     console.error("Error saving form:", err);
+     toast.error("Failed to save form");
+   }
+ };
+
 
   const renderQuestionEditor = (question: Question) => {
     return (
