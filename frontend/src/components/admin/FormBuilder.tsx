@@ -14,7 +14,6 @@ import {
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-
 type InputTypes = "rating" | "text" | "textarea" | "multiple" | "checkbox";
 
 type Question = {
@@ -37,6 +36,7 @@ const FormBuilder = () => {
   const [formDescription, setFormDescription] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const questionTypes: QuestionType[] = [
     { type: "rating", label: "Rating Scale", icon: Star },
@@ -50,7 +50,7 @@ const FormBuilder = () => {
     const newQuestion = {
       id: Date.now(),
       type,
-      title: "",
+      title: "Untitled question",
       required: false,
       options: type === "multiple" || type === "checkbox" ? ["Option 1"] : [],
       ratingScale: type === "rating" ? 5 : null,
@@ -107,43 +107,75 @@ const FormBuilder = () => {
     );
   };
 
-  // send to backend
- const navigate = useNavigate();
+  const saveForm = async () => {
+    if (!formTitle) {
+      alert("Form title is required.");
+      return;
+    }
 
- const saveForm = async () => {
-   const formData = {
-     title: formTitle,
-     description: formDescription,
-     questions,
-     createdAt: new Date().toISOString(),
-   };
+    if (!questions.length || questions.length === 0) {
+      alert("Add at least one input field to the form.");
+      return;
+    }
 
-   try {
-     const res = await fetch("http://localhost:8080/api/forms", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify(formData),
-     });
+    // Check for empty/invalid question titles
+    for (const question of questions) {
+      if (!question.title.trim()) {
+        alert("Each question must have a valid title (non-empty).");
+        return;
+      }
 
-     if (!res.ok) {
-       throw new Error("Failed to save form");
-     }
+      // Check for empty options in multiple/checkbox type
+      if (
+        (question.type === "multiple" || question.type === "checkbox") &&
+        (!question.options.length ||
+          question.options.some((opt) => !opt.trim()))
+      ) {
+        alert(
+          `Question "${question.title}" has empty or missing options. Please fill all options.`
+        );
+        return;
+      }
+    }
 
-     const data = await res.json();
-     toast.success("Form saved successfully! 🎉");
+    const formData = {
+      title: formTitle.trim(),
+      description: formDescription.trim(),
+      questions,
+      createdAt: new Date().toISOString(),
+    };
 
-     // redirect back one step
-     setTimeout(() => {
-       navigate("/admin/dashboard");
-     }, 1000);
-   } catch (err) {
-     console.error("Error saving form:", err);
-     toast.error("Failed to save form");
-   }
- };
+    try {
+      const res = await fetch("http://localhost:8080/api/forms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
+      if (res.status === 409) {
+        const errData = await res.json();
+        alert(errData.error || "Form title already exists.");
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error("Failed to save form");
+      }
+
+      const data = await res.json();
+      toast.success("Form saved successfully! 🎉");
+
+      // redirect back one step
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 1000);
+    } catch (err) {
+      console.error("Error saving form:", err);
+      toast.error("Failed to save form");
+    }
+  };
 
   const renderQuestionEditor = (question: Question) => {
     return (

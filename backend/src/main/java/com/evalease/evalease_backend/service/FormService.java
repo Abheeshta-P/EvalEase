@@ -20,6 +20,10 @@ public class FormService {
     private FormRepository formRepository;
 
     public Form saveForm(FormDTO dto) {
+        if (formRepository.findByTitle(dto.title).isPresent()) {
+            throw new IllegalArgumentException("Form title already exists.");
+        }
+
         Form form = new Form();
         form.setTitle(dto.title);
         form.setDescription(dto.description);

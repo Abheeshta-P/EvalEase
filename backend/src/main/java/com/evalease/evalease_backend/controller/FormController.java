@@ -4,8 +4,11 @@ import com.evalease.evalease_backend.dto.FormDTO;
 import com.evalease.evalease_backend.entity.Form;
 import com.evalease.evalease_backend.service.FormService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/forms")
@@ -17,7 +20,13 @@ public class FormController {
 
     @PostMapping
     public ResponseEntity<?> createForm(@RequestBody FormDTO formDTO) {
-        Form savedForm = formService.saveForm(formDTO);
-        return ResponseEntity.ok(savedForm); // or custom response below
+        try {
+            Form savedForm = formService.saveForm(formDTO);
+            return ResponseEntity.ok(savedForm);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", ex.getMessage()));
+        }
     }
 }
