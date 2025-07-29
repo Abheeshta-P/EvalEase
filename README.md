@@ -1,4 +1,4 @@
-# 🧩 EvalEase - Dynamic Form Builder
+# 🧩 EvalEase
 
 EvalEase is a training feedback collection portal designed to gather and analyze participant feedback after training sessions. It helps Capability or L&D teams evaluate training effectiveness and continuously improve content and delivery. The platform enables administrators to create custom feedback forms for different training types. 
 
