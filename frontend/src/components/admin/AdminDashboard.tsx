@@ -27,7 +27,7 @@ const AdminDashboard = ({ user }) => {
     { title: 'Avg Rating', value: '4.2', icon: TrendingUp, color: 'orange' }
   ];
 
- 
+   
 
   useEffect(() => {
     axios.get('http://localhost:8081/api/forms/recent') // Adjust port if needed
@@ -125,7 +125,7 @@ const AdminDashboard = ({ user }) => {
         </div>
 
         {/* Recent Forms */}
-        <h1>Recent Forms</h1>
+        <h1 className="text-2xl font-bold text-gray-600 pb-2">Recent Forms</h1>
         {recentForms.map((form, index) => (
   <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
     <div>
