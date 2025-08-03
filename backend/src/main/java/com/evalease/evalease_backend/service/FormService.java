@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 public class FormService {
@@ -27,7 +28,7 @@ public class FormService {
         Form form = new Form();
         form.setTitle(dto.title);
         form.setDescription(dto.description);
-        form.setCreatedAt(Instant.parse(dto.createdAt));
+        form.setCreatedAt(LocalDateTime.now());
 
         List<Question> questions = new ArrayList<>();
 

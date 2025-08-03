@@ -1,14 +1,10 @@
-
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Calendar, 
   Clock, 
   CheckCircle, 
   FileText, 
-  User, 
-  LogOut,
-  Bell
+  LogOut
 } from 'lucide-react';
 
 const EmployeeDashboard = ({ user }) => {
@@ -72,12 +68,6 @@ const EmployeeDashboard = ({ user }) => {
               <p className="text-gray-600">Welcome back, {user?.name || 'Employee'}</p>
             </div>
             <div className="flex space-x-4">
-              <button className="p-2 text-gray-600 hover:text-gray-800 relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  2
-                </span>
-              </button>
               <button 
                 onClick={handleLogout}
                 className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
