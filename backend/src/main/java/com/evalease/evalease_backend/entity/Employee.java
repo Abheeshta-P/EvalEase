@@ -19,6 +19,8 @@ public class Employee {
 
     private String name;
 
+    // private String email;
+    @Column(unique = true)
     private String email;
 
     // This links employee to all submitted forms

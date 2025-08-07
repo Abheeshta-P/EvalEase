@@ -28,9 +28,6 @@ public class SubmittedForm {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @Column(nullable = false)
-    private boolean feedbackSubmitted = false;
-
     @OneToMany(mappedBy = "submittedForm", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Response> responses;
 }

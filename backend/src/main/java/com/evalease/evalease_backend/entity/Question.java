@@ -1,6 +1,7 @@
 package com.evalease.evalease_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,20 +20,16 @@ public class Question {
     private Long id;
 
     private String title;
-
-    private String type; // "text", "textarea", "rating", "multiple", "checkbox", etc.
-
+    private String type;
     private boolean required;
-
-    private Integer ratingScale; // Only used if type is "rating", else null
+    private Integer ratingScale;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "form_id")
     @JsonBackReference
     private Form form;
 
-
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OptionItem> options; // Only for multiple choice or checkbox
+    @JsonManagedReference
+    private List<OptionItem> options;
 }
-

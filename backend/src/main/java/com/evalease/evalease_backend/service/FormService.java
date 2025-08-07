@@ -1,9 +1,10 @@
 package com.evalease.evalease_backend.service;
 
 import com.evalease.evalease_backend.dto.FormDTO;
+import com.evalease.evalease_backend.dto.FormDTO.QuestionDTO;
 import com.evalease.evalease_backend.entity.Form;
-import com.evalease.evalease_backend.entity.OptionItem;
 import com.evalease.evalease_backend.entity.Question;
+import com.evalease.evalease_backend.entity.OptionItem;
 import com.evalease.evalease_backend.repository.FormRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,49 +13,87 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
 
 @Service
 public class FormService {
 
-    @Autowired
-    private FormRepository formRepository;
+        @Autowired
+        private FormRepository formRepository;
 
-    public Form saveForm(FormDTO dto) {
-        if (formRepository.findByTitle(dto.title).isPresent()) {
-            throw new IllegalArgumentException("Form title already exists.");
+        // Save New Form with Questions & Options
+        public Form saveForm(FormDTO formDTO) {
+                if (formRepository.findAll().stream().anyMatch(f -> f.getTitle().equals(formDTO.getTitle()))) {
+                        throw new IllegalArgumentException("Form with the same title already exists.");
+                }
+
+                Form form = Form.builder()
+                                .title(formDTO.getTitle())
+                                .description(formDTO.getDescription())
+                                .createdAt(Instant.now())
+                                .build();
+
+                List<Question> questions = new ArrayList<>();
+
+                for (QuestionDTO questionDTO : formDTO.getQuestions()) {
+                        Question question = Question.builder()
+                                        .title(questionDTO.getTitle())
+                                        .type(questionDTO.getType())
+                                        .required(questionDTO.isRequired())
+                                        .ratingScale(questionDTO.getRatingScale())
+                                        .form(form)
+                                        .build();
+
+                        if (questionDTO.getOptions() != null) {
+                                List<OptionItem> options = questionDTO.getOptions().stream()
+                                                .map(opt -> OptionItem.builder()
+                                                                .value(opt)
+                                                                .question(question)
+                                                                .build())
+                                                .collect(Collectors.toList());
+                                question.setOptions(options);
+                        }
+
+                        questions.add(question);
+                }
+
+                form.setQuestions(questions);
+
+                return formRepository.save(form);
         }
 
-        Form form = new Form();
-        form.setTitle(dto.title);
-        form.setDescription(dto.description);
-        form.setCreatedAt(LocalDateTime.now());
-
-        List<Question> questions = new ArrayList<>();
-
-        for (FormDTO.QuestionDTO q : dto.questions) {
-            Question question = new Question();
-            question.setTitle(q.title);
-            question.setType(q.type);
-            question.setRequired(q.required);
-            question.setRatingScale(q.ratingScale);
-            question.setForm(form); // Link back to parent form
-
-            // Convert options from string list to OptionItem list
-            if (q.options != null && !q.options.isEmpty()) {
-                List<OptionItem> optionItems = q.options.stream()
-                        .map(opt -> OptionItem.builder()
-                                .value(opt)
-                                .question(question)
-                                .build())
-                        .collect(Collectors.toList());
-                question.setOptions(optionItems);
-            }
-
-            questions.add(question);
+        public List<Form> getAllForms() {
+                return formRepository.findAll();
         }
 
-        form.setQuestions(questions);
-        return formRepository.save(form);
-    }
+        public FormDTO getFormDTOById(Long id) {
+                Form form = formRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Form not found with id: " + id));
+
+                List<QuestionDTO> questionDTOs = form.getQuestions().stream()
+                                .map(this::convertToQuestionDTO)
+                                .collect(Collectors.toList());
+
+                return FormDTO.builder()
+                                .id(form.getId())
+                                .title(form.getTitle())
+                                .description(form.getDescription())
+                                .createdAt(form.getCreatedAt().toString())
+                                .questions(questionDTOs)
+                                .build();
+        }
+
+        private QuestionDTO convertToQuestionDTO(Question question) {
+                List<String> options = question.getOptions() != null
+                                ? question.getOptions().stream().map(OptionItem::getValue).collect(Collectors.toList())
+                                : null;
+
+                return QuestionDTO.builder()
+                                .id(question.getId())
+                                .title(question.getTitle())
+                                .type(question.getType())
+                                .required(question.isRequired())
+                                .ratingScale(question.getRatingScale())
+                                .options(options)
+                                .build();
+        }
 }
