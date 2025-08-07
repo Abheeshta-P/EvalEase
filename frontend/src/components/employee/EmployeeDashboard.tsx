@@ -1,60 +1,38 @@
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Calendar, 
   Clock, 
   CheckCircle, 
   FileText, 
-  LogOut
+  LogOut, 
+  Bell 
 } from 'lucide-react';
 
 const EmployeeDashboard = ({ user }) => {
   const navigate = useNavigate();
+  const [availableForms, setAvailableForms] = useState([]);
 
   const handleLogout = () => {
     navigate('/login');
   };
 
+  useEffect(() => {
+    fetch('http://localhost:8080/api/forms')
+      .then(res => res.json())
+      .then(data => setAvailableForms(data))
+      .catch(err => console.error("Failed to fetch forms", err));
+  }, []);
+
   const upcomingSessions = [
-    { 
-      id: 1, 
-      title: 'Leadership Development Workshop', 
-      date: '2024-01-20', 
-      time: '10:00 AM',
-      status: 'upcoming',
-      hasForm: true
-    },
-    { 
-      id: 2, 
-      title: 'Technical Skills Training', 
-      date: '2024-01-22', 
-      time: '2:00 PM',
-      status: 'upcoming',
-      hasForm: true
-    },
-    { 
-      id: 3, 
-      title: 'Team Communication Session', 
-      date: '2024-01-18', 
-      time: '11:00 AM',
-      status: 'completed',
-      hasForm: true,
-      feedbackSubmitted: false
-    }
+    { id: 1, title: 'Leadership Development Workshop', date: '2024-01-20', time: '10:00 AM', status: 'upcoming', hasForm: true },
+    { id: 2, title: 'Technical Skills Training', date: '2024-01-22', time: '2:00 PM', status: 'upcoming', hasForm: true },
+    { id: 3, title: 'Team Communication Session', date: '2024-01-18', time: '11:00 AM', status: 'completed', hasForm: true, feedbackSubmitted: false }
   ];
 
   const completedSessions = [
-    { 
-      id: 4, 
-      title: 'Project Management Basics', 
-      date: '2024-01-15', 
-      feedbackSubmitted: true
-    },
-    { 
-      id: 5, 
-      title: 'Customer Service Excellence', 
-      date: '2024-01-12', 
-      feedbackSubmitted: true
-    }
+    { id: 4, title: 'Project Management Basics', date: '2024-01-15', feedbackSubmitted: true },
+    { id: 5, title: 'Customer Service Excellence', date: '2024-01-12', feedbackSubmitted: true }
   ];
 
   return (
@@ -68,6 +46,10 @@ const EmployeeDashboard = ({ user }) => {
               <p className="text-gray-600">Welcome back, {user?.name || 'Employee'}</p>
             </div>
             <div className="flex space-x-4">
+              <button className="p-2 text-gray-600 hover:text-gray-800 relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">2</span>
+              </button>
               <button 
                 onClick={handleLogout}
                 className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
@@ -114,7 +96,7 @@ const EmployeeDashboard = ({ user }) => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Pending Feedback</p>
-                <p className="text-2xl font-bold text-gray-900">1</p>
+                <p className="text-2xl font-bold text-gray-900">{availableForms.length}</p>
               </div>
             </div>
           </div>
@@ -186,8 +168,37 @@ const EmployeeDashboard = ({ user }) => {
           </div>
         </div>
 
-        {/* Recent Sessions */}
-        <div className="bg-white rounded-xl shadow-sm border">
+        {/* Available Feedback Forms from Admin */}
+        {availableForms.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border mb-8">
+            <div className="p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Available Feedback Forms</h2>
+              <p className="text-gray-600">Click below to fill out general feedback forms</p>
+            </div>
+            <div className="p-6 space-y-4">
+              {availableForms.map(form => (
+  <Link
+    key={form.id} // ✅ This is your unique form ID
+    to={`/employee/feedback/${form.id}`}
+    className="block border border-blue-200 rounded-lg p-4 hover:bg-blue-50 transition duration-200"
+  >
+    <h3 className="font-medium text-gray-900">{form.title}</h3>
+    <p className="text-sm text-gray-600">{form.description}</p>
+     {/* <Link 
+                    to={`/employee/feedback/${form.id}`}
+                    className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition duration-200"
+                  >
+                    Submit Feedback
+                  </Link> */}
+  </Link>
+))}
+
+            </div>
+          </div>
+        )}
+
+        {/* Recent Completed Sessions */}
+        <div className="bg-white rounded-xl shadow-sm border mb-8">
           <div className="p-6 border-b">
             <h2 className="text-xl font-semibold text-gray-900">Recent Completed Sessions</h2>
           </div>
@@ -212,6 +223,27 @@ const EmployeeDashboard = ({ user }) => {
             </div>
           </div>
         </div>
+
+        {/* Verification Container */}
+        <div className="bg-white rounded-xl shadow-sm border">
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-semibold text-gray-900">Feedback Form Status</h2>
+          </div>
+          <div className="p-6">
+            {availableForms.length > 0 ? (
+              <ul className="list-disc list-inside text-gray-800 space-y-1">
+                {availableForms.map((form) => (
+                  <li key={form._id}>
+                    <span className="font-medium">Title:</span> {form.title}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 italic">Waiting for form...</p>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

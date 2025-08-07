@@ -20,30 +20,76 @@ const Signup = ({ setUser }) => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+  //   if (formData.password !== formData.confirmPassword) {
+  //     alert('Passwords do not match!');
+  //     return;
+  //   }
+    
+  //   // Mock signup logic
+  //   const mockUser = {
+  //     id: Date.now(),
+  //     email: formData.email,
+  //     name: formData.name,
+  //     type: formData.userType
+  //   };
+    
+  //   setUser(mockUser);
+    
+  //   if (formData.userType === 'admin') {
+  //     navigate('/admin/dashboard');
+  //   } else {
+  //     navigate('/employee/dashboard');
+  //   }
+  // };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (formData.password !== formData.confirmPassword) {
+    alert('Passwords do not match!');
+    return;
+  }
+
+  const payload = {
+    name: formData.name,
+    email: formData.email,
+    // Password is just for UI mock, not storing it yet in DB
+  };
+
+  try {
+    const res = await fetch('http://localhost:8080/api/employees', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.status === 400) {
+      alert('Email already exists. Please login.');
       return;
     }
-    
-    // Mock signup logic
-    const mockUser = {
-      id: Date.now(),
-      email: formData.email,
-      name: formData.name,
-      type: formData.userType
-    };
-    
-    setUser(mockUser);
-    
+
+    const user = await res.json();
+
+    localStorage.setItem("employeeId", user.id);
+    localStorage.setItem("userType", formData.userType);
+    localStorage.setItem("employeeName", user.name);
+
+    setUser({ ...user, type: formData.userType });
+
     if (formData.userType === 'admin') {
       navigate('/admin/dashboard');
     } else {
       navigate('/employee/dashboard');
     }
-  };
+
+  } catch (err) {
+    console.error('Signup failed', err);
+    alert('Signup failed. Please try again.');
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100">
