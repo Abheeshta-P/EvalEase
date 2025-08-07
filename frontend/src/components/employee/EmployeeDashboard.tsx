@@ -42,15 +42,15 @@ const EmployeeDashboard = ({ user }) => {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Employee Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user?.name || 'Employee'}</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Employee Dashboard
+              </h1>
+              <p className="text-gray-600">
+                Welcome back, {user?.name || "Employee"}
+              </p>
             </div>
             <div className="flex space-x-4">
-              <button className="p-2 text-gray-600 hover:text-gray-800 relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">2</span>
-              </button>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
               >
@@ -63,136 +63,102 @@ const EmployeeDashboard = ({ user }) => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Calendar className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Upcoming Sessions</p>
-                <p className="text-2xl font-bold text-gray-900">2</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-green-100 rounded-full">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Completed Sessions</p>
-                <p className="text-2xl font-bold text-gray-900">5</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-orange-100 rounded-full">
-                <FileText className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Pending Feedback</p>
-                <p className="text-2xl font-bold text-gray-900">{availableForms.length}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Upcoming Sessions */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
           <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">Upcoming Training Sessions</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Upcoming Training Sessions
+            </h2>
           </div>
           <div className="p-6">
             <div className="space-y-4">
-              {upcomingSessions.filter(session => session.status === 'upcoming').map((session) => (
-                <div key={session.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-blue-100 rounded-full">
-                      <Calendar className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{session.title}</h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <span>{session.date}</span>
-                        <span className="flex items-center space-x-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{session.time}</span>
-                        </span>
+              {upcomingSessions
+                .filter((session) => session.status === "upcoming")
+                .map((session) => (
+                  <div
+                    key={session.id}
+                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="p-2 bg-blue-100 rounded-full">
+                        <Calendar className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          {session.title}
+                        </h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <span>{session.date}</span>
+                          <span className="flex items-center space-x-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{session.time}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                        Upcoming
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                      Upcoming
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
 
         {/* Pending Feedback */}
-        <div className="bg-white rounded-xl shadow-sm border mb-8">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">Pending Feedback</h2>
-            <p className="text-gray-600">Please provide feedback for completed sessions</p>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {upcomingSessions.filter(session => session.status === 'completed' && !session.feedbackSubmitted).map((session) => (
-                <div key={session.id} className="flex items-center justify-between p-4 border border-orange-200 rounded-lg bg-orange-50">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-orange-100 rounded-full">
-                      <FileText className="h-5 w-5 text-orange-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{session.title}</h3>
-                      <p className="text-sm text-gray-600">Completed on {session.date}</p>
-                    </div>
-                  </div>
-                  <Link 
-                    to={`/employee/feedback/${session.id}`}
-                    className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition duration-200"
-                  >
-                    Submit Feedback
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Available Feedback Forms from Admin */}
-        {availableForms.length > 0 && (
+        {availableForms.length > 0 ? (
           <div className="bg-white rounded-xl shadow-sm border mb-8">
             <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Available Feedback Forms</h2>
-              <p className="text-gray-600">Click below to fill out general feedback forms</p>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Available Feedback Forms
+              </h2>
+              <p className="text-gray-600">
+                Click below to fill out general feedback forms
+              </p>
             </div>
-            <div className="p-6 space-y-4">
-              {availableForms.map(form => (
-  <Link
-    key={form.id} // ✅ This is your unique form ID
-    to={`/employee/feedback/${form.id}`}
-    className="block border border-blue-200 rounded-lg p-4 hover:bg-blue-50 transition duration-200"
-  >
-    <h3 className="font-medium text-gray-900">{form.title}</h3>
-    <p className="text-sm text-gray-600">{form.description}</p>
-     {/* <Link 
+            <div className="p-6">
+              <div className="space-y-4">
+                {availableForms.map((form) => (
+                  <Link
+                    key={form.id}
                     to={`/employee/feedback/${form.id}`}
-                    className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition duration-200"
+                    className="flex items-center justify-between p-4 border border-blue-200 rounded-lg bg-blue-50 hover:bg-blue-100 transition duration-200"
                   >
-                    Submit Feedback
-                  </Link> */}
-  </Link>
-))}
-
+                    <div className="flex items-center space-x-4">
+                      <div className="p-2 bg-blue-100 rounded-full">
+                        <FileText className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          {form.title}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {form.description}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                      Submit Feedback
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border mb-8">
+            <div className="p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Available Feedback Forms
+              </h2>
+              <p className="text-gray-600">
+                Click below to fill out general feedback forms
+              </p>
+            </div>
+            <div className="p-6 text-center text-gray-500">
+              <p>No feedback forms are currently available.</p>
             </div>
           </div>
         )}
@@ -200,19 +166,28 @@ const EmployeeDashboard = ({ user }) => {
         {/* Recent Completed Sessions */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
           <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">Recent Completed Sessions</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Recent Completed Sessions
+            </h2>
           </div>
           <div className="p-6">
             <div className="space-y-4">
               {completedSessions.map((session) => (
-                <div key={session.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div
+                  key={session.id}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                >
                   <div className="flex items-center space-x-4">
                     <div className="p-2 bg-green-100 rounded-full">
                       <CheckCircle className="h-5 w-5 text-green-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900">{session.title}</h3>
-                      <p className="text-sm text-gray-600">Completed on {session.date}</p>
+                      <h3 className="font-medium text-gray-900">
+                        {session.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Completed on {session.date}
+                      </p>
                     </div>
                   </div>
                   <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
@@ -221,26 +196,6 @@ const EmployeeDashboard = ({ user }) => {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Verification Container */}
-        <div className="bg-white rounded-xl shadow-sm border">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">Feedback Form Status</h2>
-          </div>
-          <div className="p-6">
-            {availableForms.length > 0 ? (
-              <ul className="list-disc list-inside text-gray-800 space-y-1">
-                {availableForms.map((form) => (
-                  <li key={form._id}>
-                    <span className="font-medium">Title:</span> {form.title}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500 italic">Waiting for form...</p>
-            )}
           </div>
         </div>
 

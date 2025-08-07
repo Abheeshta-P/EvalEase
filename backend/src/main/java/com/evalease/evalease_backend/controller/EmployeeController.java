@@ -1,28 +1,3 @@
-// package com.evalease.evalease_backend.controller;
-
-// import com.evalease.evalease_backend.entity.Employee;
-// import com.evalease.evalease_backend.repository.EmployeeRepository;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
-
-// @RestController
-// @RequestMapping("/api/employees")
-// @CrossOrigin(origins = "http://localhost:8081")
-// public class EmployeeController {
-
-//     @Autowired
-//     private EmployeeRepository employeeRepository;
-
-//     @PostMapping("/signup")
-//     public ResponseEntity<Employee> signup(@RequestBody Employee employee) {
-//         if (employeeRepository.existsByEmail(employee.getEmail())) {
-//             return ResponseEntity.badRequest().build(); // Email already exists
-//         }
-//         Employee savedEmployee = employeeRepository.save(employee);
-//         return ResponseEntity.ok(savedEmployee);
-//     }
-// }
 package com.evalease.evalease_backend.controller;
 
 import com.evalease.evalease_backend.entity.Employee;
