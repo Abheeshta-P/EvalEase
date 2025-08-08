@@ -1,53 +1,52 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const FeedbackFormViewer = () => {
   const { id } = useParams(); // form id from route
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
   const [answers, setAnswers] = useState({});
+  const [hoveredRating, setHoveredRating] = useState({});
 
   useEffect(() => {
     fetch(`http://localhost:8080/api/forms/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log('Fetched Form:', data); // Debug log
+      .then((res) => res.json())
+      .then((data) => {
         setForm(data);
       })
-      .catch(err => console.error('Failed to load form', err));
+      .catch((err) => console.error("Failed to load form", err));
   }, [id]);
 
   const handleChange = (questionId, value) => {
-    setAnswers(prev => ({ ...prev, [questionId]: value }));
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const payload = {
-    formId: id,
-    responses: answers,
-    submittedAt: new Date().toISOString(),
-    employeeId: localStorage.getItem('employeeId')  // <-- Add this line
+    e.preventDefault();
+    const payload = {
+      formId: id,
+      responses: answers,
+      submittedAt: new Date().toISOString(),
+      employeeId: localStorage.getItem("employeeId"), // <-- Add this line
+    };
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/responses`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Failed to submit");
+
+      toast.success("Form submitted successfully! 🎉");
+      navigate("/employee/dashboard");
+    } catch (err) {
+      alert("Failed to submit response");
+      console.error(err);
+    }
   };
-
-  try {
-    const res = await fetch(`http://localhost:8080/api/responses`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error('Failed to submit');
-
-    alert('Feedback submitted successfully!');
-    navigate('/employee/dashboard');
-  } catch (err) {
-    alert('Failed to submit response');
-    console.error(err);
-  }
-};
-
-
 
   if (!form) {
     return <div className="p-6">Loading form...</div>;
@@ -97,24 +96,49 @@ const FeedbackFormViewer = () => {
                       onChange={(e) => handleChange(q.id, e.target.value)}
                     />
                   )}
-
                   {q.type === "rating" && q.ratingScale && (
-                    <div className="flex space-x-4">
-                      {[...Array(q.ratingScale)].map((_, idx) => (
-                        <label
-                          key={idx}
-                          className="flex items-center space-x-1"
-                        >
-                          <input
-                            type="radio"
-                            name={`rating-${q.id}`}
-                            value={idx + 1}
-                            required={isRequired}
-                            onChange={() => handleChange(q.id, idx + 1)}
-                          />
-                          <span>{idx + 1}</span>
-                        </label>
-                      ))}
+                    <div className="flex space-x-1">
+                      {[...Array(q.ratingScale)].map((_, idx) => {
+                        const value = idx + 1;
+                        const selectedValue = answers[q.id] || 0;
+                        const isHovered = hoveredRating[q.id] != null;
+                        const shouldFill = isHovered
+                          ? hoveredRating[q.id] >= value
+                          : selectedValue >= value;
+
+                        return (
+                          <label key={idx} className="cursor-pointer">
+                            <input
+                              type="radio"
+                              name={`rating-${q.id}`}
+                              value={value}
+                              className="hidden"
+                              required={isRequired}
+                              onChange={() => handleChange(q.id, value)}
+                              onMouseEnter={() =>
+                                setHoveredRating((prev) => ({
+                                  ...prev,
+                                  [q.id]: value,
+                                }))
+                              }
+                              onMouseLeave={() =>
+                                setHoveredRating((prev) => ({
+                                  ...prev,
+                                  [q.id]: null,
+                                }))
+                              }
+                            />
+                            <span
+                              className={`text-2xl transition-all duration-150 hover:text-yellow-400`}
+                              style={{
+                                color: shouldFill ? "#FACC15" : "#9CA3AF",
+                              }}
+                            >
+                              ★
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
                   )}
 

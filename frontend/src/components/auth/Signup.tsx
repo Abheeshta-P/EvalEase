@@ -1,95 +1,70 @@
-
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { User, Lock, Mail, UserPlus } from 'lucide-react';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { User, Lock, Mail, UserPlus } from "lucide-react";
 
 const Signup = ({ setUser }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    userType: 'employee'
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    userType: "employee",
   });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-    
-  //   if (formData.password !== formData.confirmPassword) {
-  //     alert('Passwords do not match!');
-  //     return;
-  //   }
-    
-  //   // Mock signup logic
-  //   const mockUser = {
-  //     id: Date.now(),
-  //     email: formData.email,
-  //     name: formData.name,
-  //     type: formData.userType
-  //   };
-    
-  //   setUser(mockUser);
-    
-  //   if (formData.userType === 'admin') {
-  //     navigate('/admin/dashboard');
-  //   } else {
-  //     navigate('/employee/dashboard');
-  //   }
-  // };
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (formData.password !== formData.confirmPassword) {
-    alert('Passwords do not match!');
-    return;
-  }
-
-  const payload = {
-    name: formData.name,
-    email: formData.email,
-    // Password is just for UI mock, not storing it yet in DB
-  };
-
-  try {
-    const res = await fetch('http://localhost:8080/api/employees', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (res.status === 400) {
-      alert('Email already exists. Please login.');
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
       return;
     }
 
-    const user = await res.json();
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      // Password is just for UI mock, not storing it yet in DB
+    };
 
-    localStorage.setItem("employeeId", user.id);
-    localStorage.setItem("userType", formData.userType);
-    localStorage.setItem("employeeName", user.name);
+   try {
+     const res = await fetch("http://localhost:8080/api/employees", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify(payload),
+     });
 
-    setUser({ ...user, type: formData.userType });
+     if (!res.ok) {
+       const msg = await res.text();
+       alert(msg || "Something went wrong.");
+       return;
+     }
 
-    if (formData.userType === 'admin') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/employee/dashboard');
-    }
+     const user = await res.json();
 
-  } catch (err) {
-    console.error('Signup failed', err);
-    alert('Signup failed. Please try again.');
-  }
-};
+     localStorage.setItem("employeeId", user.id);
+     localStorage.setItem("userType", formData.userType);
+     localStorage.setItem("employeeName", user.name);
 
+     setUser({ ...user, type: formData.userType });
+
+     if (formData.userType === "admin") {
+       navigate("/admin/dashboard");
+     } else {
+       navigate("/employee/dashboard");
+     }
+   } catch (err) {
+     console.error("Signup failed", err);
+     alert("Signup failed. Please try again.");
+   }
+
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100">
@@ -98,10 +73,12 @@ const Signup = ({ setUser }) => {
           <div className="mx-auto h-16 w-16 bg-green-600 rounded-full flex items-center justify-center">
             <UserPlus className="h-8 w-8 text-white" />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Join EvalEase</h2>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Join EvalEase
+          </h2>
           <p className="mt-2 text-sm text-gray-600">Create your account</p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
@@ -139,7 +116,7 @@ const Signup = ({ setUser }) => {
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 User Type
@@ -150,7 +127,7 @@ const Signup = ({ setUser }) => {
                     type="radio"
                     name="userType"
                     value="employee"
-                    checked={formData.userType === 'employee'}
+                    checked={formData.userType === "employee"}
                     onChange={handleChange}
                     className="mr-2"
                   />
@@ -161,7 +138,7 @@ const Signup = ({ setUser }) => {
                     type="radio"
                     name="userType"
                     value="admin"
-                    checked={formData.userType === 'admin'}
+                    checked={formData.userType === "admin"}
                     onChange={handleChange}
                     className="mr-2"
                   />
@@ -169,7 +146,7 @@ const Signup = ({ setUser }) => {
                 </label>
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -187,7 +164,7 @@ const Signup = ({ setUser }) => {
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm Password
@@ -213,11 +190,14 @@ const Signup = ({ setUser }) => {
           >
             Create Account
           </button>
-          
+
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="text-green-600 hover:text-green-500 font-medium">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-green-600 hover:text-green-500 font-medium"
+              >
                 Sign in
               </Link>
             </p>

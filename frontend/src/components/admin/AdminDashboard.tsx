@@ -9,13 +9,15 @@ import {
   Plus, 
   TrendingUp, 
   LogOut,
-  Settings
 } from 'lucide-react';
 
 const AdminDashboard = ({ user }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    localStorage.removeItem("employeeId");
+    localStorage.removeItem("userType");
+    localStorage.removeItem("employeeName");
     navigate('/login');
   };
 
@@ -43,9 +45,6 @@ const AdminDashboard = ({ user }) => {
               <p className="text-gray-600">Welcome back, {user?.name || 'Admin'}</p>
             </div>
             <div className="flex space-x-4">
-              <button className="p-2 text-gray-600 hover:text-gray-800">
-                <Settings className="h-5 w-5" />
-              </button>
               <button 
                 onClick={handleLogout}
                 className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"

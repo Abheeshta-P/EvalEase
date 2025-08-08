@@ -1,5 +1,6 @@
 package com.evalease.evalease_backend.controller;
 
+import org.springframework.http.HttpStatus;
 import com.evalease.evalease_backend.entity.Employee;
 import com.evalease.evalease_backend.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,15 @@ public class EmployeeController {
 
     // Endpoint to save employee during Signup
     @PostMapping
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
         Optional<Employee> existingEmployee = employeeRepository.findByEmail(employee.getEmail());
         if (existingEmployee.isPresent()) {
-            return ResponseEntity.ok(existingEmployee.get()); // Return existing if already signed up
+            // 400 Bad Request is good for validation errors
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Email already exists. Please login.");
         }
+        
         Employee savedEmployee = employeeRepository.save(employee);
         return ResponseEntity.ok(savedEmployee);
     }
