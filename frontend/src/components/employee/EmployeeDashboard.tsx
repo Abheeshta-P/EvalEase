@@ -1,39 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Calendar, 
-  Clock, 
-  CheckCircle, 
-  FileText, 
-  LogOut, 
-  Bell 
-} from 'lucide-react';
+import React, { useEffect, useState, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Calendar,
+  Clock,
+  CheckCircle,
+  FileText,
+  LogOut,
+  Bell,
+} from "lucide-react";
 
 const EmployeeDashboard = ({ user }) => {
   const navigate = useNavigate();
-  const [availableForms, setAvailableForms] = useState([]);
+  const [pendingForms, setPendingForms] = useState([]);
+  const [completedForms, setCompletedForms] = useState([]);
+  const [loadingForms, setLoadingForms] = useState(true);
+  const [errorForms, setErrorForms] = useState(null);
+
+  // Mock data for sessions (these are separate from feedback forms)
+  const upcomingSessions = [
+    {
+      id: 1,
+      title: "Leadership Development Workshop",
+      date: "2024-01-20",
+      time: "10:00 AM",
+      status: "upcoming",
+      hasForm: true,
+    },
+    {
+      id: 2,
+      title: "Technical Skills Training",
+      date: "2024-01-22",
+      time: "2:00 PM",
+      status: "upcoming",
+      hasForm: true,
+    },
+    {
+      id: 3,
+      title: "Team Communication Session",
+      date: "2024-01-18",
+      time: "11:00 AM",
+      status: "completed",
+      hasForm: true,
+    },
+  ];
 
   const handleLogout = () => {
-    navigate('/login');
+    localStorage.removeItem("employeeId"); 
+    localStorage.removeItem("userType");
+    localStorage.removeItem("employeeName");
+    navigate("/login");
   };
 
-  useEffect(() => {
-    fetch('http://localhost:8080/api/forms')
-      .then(res => res.json())
-      .then(data => setAvailableForms(data))
-      .catch(err => console.error("Failed to fetch forms", err));
+  // Callback function to fetch forms from the backend, memoized for efficiency
+  const fetchEmployeeForms = useCallback(async () => {
+    setLoadingForms(true);
+    setErrorForms(null);
+    const employeeId = localStorage.getItem("employeeId"); // Get employeeId from local storage
+
+    if (!employeeId) {
+      setErrorForms("Employee ID not found. Please log in.");
+      setLoadingForms(false);
+      return;
+    }
+
+    try {
+      // Call the backend endpoint that categorizes forms for the employee
+      const res = await fetch(
+        `http://localhost:8080/api/employee-dashboard/forms/${employeeId}`
+      );
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+
+      if (!data.success || !data.data) {
+        setErrorForms(data.error || "Unexpected response format");
+        return;
+      }
+
+     const { pendingForms = [], completedForms = [] } = data.data || {};
+     setPendingForms(pendingForms);
+     setCompletedForms(completedForms);
+
+    } catch (err) {
+      console.error("Failed to fetch employee forms", err);
+      setErrorForms("Failed to load feedback forms. Please try again.");
+    } finally {
+      setLoadingForms(false);
+    }
   }, []);
 
-  const upcomingSessions = [
-    { id: 1, title: 'Leadership Development Workshop', date: '2024-01-20', time: '10:00 AM', status: 'upcoming', hasForm: true },
-    { id: 2, title: 'Technical Skills Training', date: '2024-01-22', time: '2:00 PM', status: 'upcoming', hasForm: true },
-    { id: 3, title: 'Team Communication Session', date: '2024-01-18', time: '11:00 AM', status: 'completed', hasForm: true, feedbackSubmitted: false }
-  ];
+  useEffect(() => {
+    fetchEmployeeForms();
+  }, [fetchEmployeeForms]);
 
-  const completedSessions = [
-    { id: 4, title: 'Project Management Basics', date: '2024-01-15', feedbackSubmitted: true },
-    { id: 5, title: 'Customer Service Excellence', date: '2024-01-12', feedbackSubmitted: true }
-  ];
+  // Helper function to format date for display
+  const formatDate = (dateTimeString) => {
+    if (!dateTimeString) return "N/A";
+    const date = new Date(dateTimeString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,7 +133,7 @@ const EmployeeDashboard = ({ user }) => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Upcoming Sessions */}
+        {/* Upcoming Training Sessions (still using mock data) */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
           <div className="p-6 border-b">
             <h2 className="text-xl font-semibold text-gray-900">
@@ -107,20 +177,24 @@ const EmployeeDashboard = ({ user }) => {
           </div>
         </div>
 
-        {/* Pending Feedback */}
-        {availableForms.length > 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border mb-8">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Available Feedback Forms
-              </h2>
-              <p className="text-gray-600">
-                Click below to fill out general feedback forms
-              </p>
-            </div>
-            <div className="p-6">
+        {/* Pending Feedback Forms (now fetched from backend) */}
+        <div className="bg-white rounded-xl shadow-sm border mb-8">
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Pending Feedback Forms
+            </h2>
+            <p className="text-gray-600">
+              Please provide feedback for available forms
+            </p>
+          </div>
+          <div className="p-6">
+            {loadingForms ? (
+              <p className="text-center text-gray-500">Loading forms...</p>
+            ) : errorForms ? (
+              <p className="text-center text-red-500">{errorForms}</p>
+            ) : pendingForms.length > 0 ? (
               <div className="space-y-4">
-                {availableForms.map((form) => (
+                {pendingForms.map((form) => (
                   <Link
                     key={form.id}
                     to={`/employee/feedback/${form.id}`}
@@ -135,7 +209,7 @@ const EmployeeDashboard = ({ user }) => {
                           {form.title}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {form.description}
+                          {form.description || "No description available."}
                         </p>
                       </div>
                     </div>
@@ -145,60 +219,65 @@ const EmployeeDashboard = ({ user }) => {
                   </Link>
                 ))}
               </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl shadow-sm border mb-8">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Available Feedback Forms
-              </h2>
-              <p className="text-gray-600">
-                Click below to fill out general feedback forms
+            ) : (
+              <p className="text-center text-gray-500">
+                No pending feedback forms.
               </p>
-            </div>
-            <div className="p-6 text-center text-gray-500">
-              <p>No feedback forms are currently available.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Recent Completed Sessions */}
-        <div className="bg-white rounded-xl shadow-sm border mb-8">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Recent Completed Sessions
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {completedSessions.map((session) => (
-                <div
-                  key={session.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-green-100 rounded-full">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        {session.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        Completed on {session.date}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                    Feedback Submitted
-                  </span>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
         </div>
 
+        {/* Completed Feedback Forms (now fetched from backend) */}
+        <div className="bg-white rounded-xl shadow-sm border mb-8">
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Completed Feedback Forms
+            </h2>
+            <p className="text-gray-600">
+              View forms you have already submitted
+            </p>
+          </div>
+          <div className="p-6">
+            {loadingForms ? (
+              <p className="text-center text-gray-500">Loading forms...</p>
+            ) : errorForms ? (
+              <p className="text-center text-red-500">{errorForms}</p>
+            ) : completedForms.length > 0 ? (
+              <div className="space-y-4">
+                {completedForms.map((form) => (
+                  <div
+                    key={form.id}
+                    className="flex items-center justify-between p-4 border border-green-200 rounded-lg bg-green-50"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="p-2 bg-green-100 rounded-full">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          {form.title}
+                        </h3>
+                        {/* Display submittedAt if available */}
+                        <p className="text-sm text-gray-600">
+                          {form.description || "No description available."}
+                          {form.submittedAt &&
+                            ` (Submitted: ${formatDate(form.submittedAt)})`}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                      Feedback Submitted
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-500">
+                No completed feedback forms.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

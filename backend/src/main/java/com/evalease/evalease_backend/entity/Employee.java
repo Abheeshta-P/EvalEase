@@ -2,6 +2,7 @@ package com.evalease.evalease_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
 
@@ -25,5 +26,6 @@ public class Employee {
 
     // This links employee to all submitted forms
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<SubmittedForm> submittedForms;
 }

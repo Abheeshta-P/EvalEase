@@ -9,7 +9,6 @@ import Signup from "./components/auth/Signup";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import EmployeeDashboard from "./components/employee/EmployeeDashboard";
 import FormBuilder from "./components/admin/FormBuilder";
-import FeedbackForm from "./components/employee/FeedbackForm";
 import FeedbackFormViewer from "./components/employee/FeedbackFormViewer";
 import Analytics from "./components/admin/Analytics";
 import SessionManager from "./components/admin/SessionManager";
@@ -38,8 +37,6 @@ const App = () => {
               <Route path="/admin/analytics" element={<Analytics />} />
               <Route path="/employee/dashboard" element={<EmployeeDashboard user={user} />} />
               <Route path="/employee/feedback/:id" element={<FeedbackFormViewer />} />
-
-              <Route path="/employee/feedback/:sessionId" element={<FeedbackForm />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
