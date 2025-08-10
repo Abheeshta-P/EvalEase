@@ -28,5 +28,16 @@ EvalEase is a training feedback collection portal designed to gather and analyze
 - 🐬 MySQL schema auto-generation on startup
 - 🔒 DTO layer to prevent entity exposure
 
+## Setup
+
+### Add env file in frontend folder with
+```bash
+VITE_SERVER_PORT = 'http://localhost:8080'
+```
+
+### For now admin credential is hard coded to (can change as per company requirement)
+- `email` = "`admin@evalease.com`" 
+- `password` = "`adminpass`"
+
 > Under development all rights are reserved.
 

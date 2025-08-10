@@ -1,6 +1,6 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { 
   Users, 
   FileText, 
@@ -13,6 +13,27 @@ import {
 
 const AdminDashboard = ({ user }) => {
   const navigate = useNavigate();
+  const [recentForms, setRecentForms] = useState([]);
+  const [stats, setStats] = useState({
+    totalForms: 0,
+    activeSessions: 0,
+    responses: 0,
+    avgRating: 0,
+  });
+
+  const colorBgMap = {
+    blue: "bg-blue-100",
+    green: "bg-green-100",
+    purple: "bg-purple-100",
+    orange: "bg-orange-100"
+  };
+
+  const colorTextMap = {
+    blue: "text-blue-600",
+    green: "text-green-600",
+    purple: "text-purple-600",
+    orange: "text-orange-600"
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("employeeId");
@@ -21,18 +42,31 @@ const AdminDashboard = ({ user }) => {
     navigate('/login');
   };
 
-  const stats = [
-    { title: 'Total Forms', value: '12', icon: FileText, color: 'blue' },
-    { title: 'Active Sessions', value: '8', icon: Calendar, color: 'green' },
-    { title: 'Responses', value: '156', icon: Users, color: 'purple' },
-    { title: 'Avg Rating', value: '4.2', icon: TrendingUp, color: 'orange' }
+  const statsData = [
+    { title: 'Total Forms', value: stats.totalForms, icon: FileText, color: 'blue' },
+    { title: 'Active Sessions', value: stats.activeSessions, icon: Calendar, color: 'green' },
+    { title: 'Responses', value: stats.responses, icon: Users, color: 'purple' },
+    { title: 'Avg Rating', value: stats.avgRating.toFixed(1), icon: TrendingUp, color: 'orange' }
   ];
 
-  const recentForms = [
-    { id: 1, name: 'Leadership Training Feedback', responses: 24, created: '2024-01-15' },
-    { id: 2, name: 'Technical Skills Assessment', responses: 18, created: '2024-01-12' },
-    { id: 3, name: 'Team Communication Survey', responses: 31, created: '2024-01-10' }
-  ];
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_SERVER_PORT}/api/forms/recent`) // Adjust port if needed
+      .then(res => setRecentForms(res.data))
+      .catch(err => console.error('Error fetching forms:', err));
+  }, []);
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_SERVER_PORT}/admin/dashboard/stats`)
+      .then(res => {
+        setStats({
+          totalForms: res.data.totalForms,
+          activeSessions: res.data.activeSessions,
+          responses: res.data.responses,
+          avgRating: res.data.avgRating,
+        });
+      })
+      .catch(err => console.error('Error fetching dashboard stats:', err));
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,15 +94,15 @@ const AdminDashboard = ({ user }) => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+          {statsData.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm border">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                   <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-full bg-${stat.color}-100`}>
-                  <stat.icon className={`h-6 w-6 text-${stat.color}-600`} />
+                <div className={`${colorBgMap[stat.color]} p-3 rounded-full`}>
+                  <stat.icon className={`${colorTextMap[stat.color]} h-6 w-6`} />
                 </div>
               </div>
             </div>
@@ -120,27 +154,26 @@ const AdminDashboard = ({ user }) => {
         </div>
 
         {/* Recent Forms */}
-        <div className="bg-white rounded-xl shadow-sm border">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">Recent Forms</h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {recentForms.map((form) => (
-                <div key={form.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <div>
-                    <h3 className="font-medium text-gray-900">{form.name}</h3>
-                    <p className="text-sm text-gray-600">Created on {form.created}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-900">{form.responses} responses</p>
-                    <p className="text-sm text-gray-600">Total submissions</p>
-                  </div>
-                </div>
-              ))}
+        <h1 className="text-2xl font-bold text-gray-600 pb-2">Recent Forms</h1>
+        {recentForms.map((form, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            <div>
+              <h3 className="font-medium text-gray-900">{form.title}</h3>
+              <p className="text-sm text-gray-600">
+                Created on {new Date(form.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-semibold text-gray-900">
+                {form.responseCount} {form.responseCount === 1 ? "response" : "responses"}
+              </p>
+              <p className="text-sm text-gray-600">Total submissions</p>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

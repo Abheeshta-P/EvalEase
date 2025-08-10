@@ -2,6 +2,7 @@ package com.evalease.evalease_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.Builder;
 
 @Entity
 @Getter
@@ -26,4 +27,8 @@ public class Response {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submitted_form_id")
     private SubmittedForm submittedForm;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "form_id")
+    private Form form;
 }

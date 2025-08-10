@@ -10,7 +10,7 @@ const FeedbackFormViewer = () => {
   const [hoveredRating, setHoveredRating] = useState({});
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/forms/${id}`)
+    fetch(`${import.meta.env.VITE_SERVER_PORT}/api/forms/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setForm(data);
@@ -32,11 +32,14 @@ const FeedbackFormViewer = () => {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/api/responses`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_SERVER_PORT}/api/responses`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to submit");
 
