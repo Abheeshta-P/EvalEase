@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
 import java.time.Instant;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Data
@@ -27,4 +28,7 @@ public class Form {
     @JsonManagedReference
     private List<Question> questions;
 
+    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Response> responses;
 }

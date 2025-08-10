@@ -146,7 +146,7 @@ const FormBuilder = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:8080/api/forms", {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_PORT}/api/forms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -45,7 +45,7 @@ const EmployeeDashboard = ({ user }) => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("employeeId"); 
+    localStorage.removeItem("employeeId");
     localStorage.removeItem("userType");
     localStorage.removeItem("employeeName");
     navigate("/login");
@@ -66,7 +66,9 @@ const EmployeeDashboard = ({ user }) => {
     try {
       // Call the backend endpoint that categorizes forms for the employee
       const res = await fetch(
-        `http://localhost:8080/api/employee-dashboard/forms/${employeeId}`
+        `${
+          import.meta.env.VITE_SERVER_PORT
+        }/api/employee-dashboard/forms/${employeeId}`
       );
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -78,10 +80,9 @@ const EmployeeDashboard = ({ user }) => {
         return;
       }
 
-     const { pendingForms = [], completedForms = [] } = data.data || {};
-     setPendingForms(pendingForms);
-     setCompletedForms(completedForms);
-
+      const { pendingForms = [], completedForms = [] } = data.data || {};
+      setPendingForms(pendingForms);
+      setCompletedForms(completedForms);
     } catch (err) {
       console.error("Failed to fetch employee forms", err);
       setErrorForms("Failed to load feedback forms. Please try again.");
