@@ -110,7 +110,7 @@ const AdminDashboard = ({ user }) => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Link 
             to="/admin/forms"
             className="bg-blue-600 text-white p-6 rounded-xl hover:bg-blue-700 transition duration-200"
@@ -143,14 +143,6 @@ const AdminDashboard = ({ user }) => {
             </div>
             <p className="text-purple-100 text-sm mt-2">Analyze feedback data</p>
           </Link>
-
-          <div className="bg-orange-600 text-white p-6 rounded-xl hover:bg-orange-700 transition duration-200 cursor-pointer">
-            <div className="flex items-center space-x-3">
-              <Users className="h-6 w-6" />
-              <span className="font-semibold">User Management</span>
-            </div>
-            <p className="text-orange-100 text-sm mt-2">Manage users & permissions</p>
-          </div>
         </div>
 
         {/* Recent Forms */}
