@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { User, Lock, Mail, UserPlus, XCircle } from "lucide-react"; 
+import { User, Lock, Mail, UserPlus, XCircle } from "lucide-react";
 
 const Signup = ({ setUser }) => {
   const [formData, setFormData] = useState({
@@ -23,7 +23,7 @@ const Signup = ({ setUser }) => {
   // Function to show custom messages (success/error)
   const showMessage = (type, text) => {
     setMessage({ type, text });
-    setTimeout(() => setMessage({ type: "", text: "" }), 3000); 
+    setTimeout(() => setMessage({ type: "", text: "" }), 3000);
   };
 
   const handleSubmit = async (e) => {
@@ -77,16 +77,16 @@ const Signup = ({ setUser }) => {
 
       // Store user data in localStorage consistently with login
       localStorage.setItem("employeeId", user.id);
-      localStorage.setItem("userType", formData.userType); 
+      localStorage.setItem("userType", formData.userType);
       localStorage.setItem("employeeName", user.name);
-      // localStorage.setItem("userEmail", user.email); 
+      // localStorage.setItem("userEmail", user.email);
       localStorage.setItem(
         "loggedInUser",
         JSON.stringify({
           id: user.id,
           name: user.name,
           email: user.email,
-          type: formData.userType, 
+          type: formData.userType,
         })
       );
 
