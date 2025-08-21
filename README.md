@@ -1,10 +1,3 @@
-Got it bro 👌
-I’ll rewrite your **EvalEase README** in a cleaner, step-by-step way so that anyone can install and run it without confusion.
-
-Here’s the updated version 👇
-
----
-
 # 🧩 EvalEase
 
 EvalEase is a training feedback collection portal designed to gather and analyze participant feedback after training sessions.
