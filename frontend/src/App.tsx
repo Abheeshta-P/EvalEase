@@ -11,7 +11,6 @@ import EmployeeDashboard from "./components/employee/EmployeeDashboard";
 import FormBuilder from "./components/admin/FormBuilder";
 import FeedbackFormViewer from "./components/employee/FeedbackFormViewer";
 import Analytics from "./components/admin/analytics/Analytics";
-import SessionManager from "./components/admin/SessionManager";
 import SessionAnalytics from "./components/admin/analytics/SessionAnalytics";
 import NotFound from "./pages/NotFound";
 import { useState } from 'react';
@@ -34,7 +33,6 @@ const App = () => {
               <Route path="/signup" element={<Signup setUser={setUser} />} />
               <Route path="/admin/dashboard" element={<AdminDashboard user={user} />} />
               <Route path="/admin/forms" element={<FormBuilder />} />
-              <Route path="/admin/sessions" element={<SessionManager />} />
               <Route path="/admin/analytics" element={<Analytics />} />
               <Route path="/employee/dashboard" element={<EmployeeDashboard user={user} />} />
               <Route path="/admin/analytics/:formId" element={<SessionAnalytics />} />
