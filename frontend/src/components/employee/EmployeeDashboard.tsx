@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Calendar,
-  Clock,
   CheckCircle,
   FileText,
   LogOut,
-  Bell,
 } from "lucide-react";
 
 const EmployeeDashboard = ({ user }) => {
@@ -15,34 +12,6 @@ const EmployeeDashboard = ({ user }) => {
   const [completedForms, setCompletedForms] = useState([]);
   const [loadingForms, setLoadingForms] = useState(true);
   const [errorForms, setErrorForms] = useState(null);
-
-  // Mock data for sessions (these are separate from feedback forms)
-  const upcomingSessions = [
-    {
-      id: 1,
-      title: "Leadership Development Workshop",
-      date: "2024-01-20",
-      time: "10:00 AM",
-      status: "upcoming",
-      hasForm: true,
-    },
-    {
-      id: 2,
-      title: "Technical Skills Training",
-      date: "2024-01-22",
-      time: "2:00 PM",
-      status: "upcoming",
-      hasForm: true,
-    },
-    {
-      id: 3,
-      title: "Team Communication Session",
-      date: "2024-01-18",
-      time: "11:00 AM",
-      status: "completed",
-      hasForm: true,
-    },
-  ];
 
   const handleLogout = () => {
     localStorage.removeItem("employeeId");
@@ -134,50 +103,6 @@ const EmployeeDashboard = ({ user }) => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Upcoming Training Sessions (still using mock data) */}
-        <div className="bg-white rounded-xl shadow-sm border mb-8">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Upcoming Training Sessions
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {upcomingSessions
-                .filter((session) => session.status === "upcoming")
-                .map((session) => (
-                  <div
-                    key={session.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="p-2 bg-blue-100 rounded-full">
-                        <Calendar className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900">
-                          {session.title}
-                        </h3>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600">
-                          <span>{session.date}</span>
-                          <span className="flex items-center space-x-1">
-                            <Clock className="h-4 w-4" />
-                            <span>{session.time}</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                        Upcoming
-                      </span>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-
         {/* Pending Feedback Forms (now fetched from backend) */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
           <div className="p-6 border-b">

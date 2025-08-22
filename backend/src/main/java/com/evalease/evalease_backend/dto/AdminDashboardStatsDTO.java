@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AdminDashboardStatsDTO {
     private int totalForms;
-    private int activeSessions;
     private int responses;
     private double avgRating;
 }

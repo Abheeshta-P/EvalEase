@@ -116,13 +116,11 @@ public class FormService {
         
     public AdminDashboardStatsDTO getAdminDashboardStats() {
     int totalForms = formRepository.countAllForms();
-    int activeSessions = submittedFormRepository.countActiveSessionsLast30Minutes();
     int responses = responseRepository.countAllResponses();
     Double avgRating = responseRepository.findAverageRatingForRatingQuestions();
 
     return new AdminDashboardStatsDTO(
         totalForms,
-        activeSessions,
         responses,
         avgRating != null ? avgRating : 0.0
     );
