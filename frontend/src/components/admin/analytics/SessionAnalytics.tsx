@@ -104,16 +104,6 @@ const SessionAnalytics: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Improvement suggestion</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
-              
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Rating Questions */}
@@ -203,7 +193,7 @@ const SessionAnalytics: React.FC = () => {
       {/* Textarea Questions (Sentiment) */}
       {analyticsData.questions.some(q => q.questionType === 'textarea') && (
         <div className="mb-10">
-          <h2 className="text-xl font-semibold mb-4">Text Responses</h2>
+          <h2 className="text-xl font-semibold mb-4">Long Text Responses</h2>
           <div className="grid grid-cols-1 gap-6">
             {analyticsData.questions
               .filter(q => q.questionType === 'textarea')
